@@ -47,42 +47,10 @@ module Mobility
   begin
     require "rails"
     Loaded::Rails = true
+    require "rails/generators/mobility/generators"
   rescue LoadError => e
     raise unless e.message =~ /rails/
     Loaded::Rails = false
-  end
-
-  begin
-    require "active_record"
-    raise VersionNotSupportedError, "Mobility is only compatible with ActiveRecord 4.2 and greater" if ::ActiveRecord::VERSION::STRING < "4.2"
-    Loaded::ActiveRecord = true
-  rescue LoadError => e
-    raise unless e.message =~ /active_record/
-    Loaded::ActiveRecord = false
-  end
-
-  if Loaded::ActiveRecord
-    require "mobility/active_model"
-    require "mobility/active_record"
-    if Loaded::Rails
-      require "rails/generators/mobility/generators"
-    end
-  end
-
-  begin
-    require "sequel"
-    raise VersionNotSupportedError, "Mobility is only compatible with Sequel 4.0 and greater" if ::Sequel::MAJOR < 4
-    require "sequel/plugins/mobility"
-    unless defined?(ActiveSupport::Inflector)
-      # TODO: avoid automatically including the inflector extension
-      require "sequel/extensions/inflector"
-    end
-    require "sequel/plugins/dirty"
-    require "mobility/sequel"
-    Loaded::Sequel = true
-  rescue LoadError => e
-    raise unless e.message =~ /sequel/
-    Loaded::Sequel = false
   end
 
   class << self
@@ -94,14 +62,6 @@ module Mobility
 
       if translates = Mobility.config.accessor_method
         model_class.singleton_class.send(:alias_method, translates, :mobility_accessor)
-      end
-
-      if Loaded::ActiveRecord && model_class < ::ActiveRecord::Base
-        model_class.include(ActiveRecord)
-      end
-
-      if Loaded::Sequel && model_class < ::Sequel::Model
-        model_class.include(Sequel)
       end
     end
 

@@ -13,6 +13,18 @@ Automatically includes dirty plugin in model class when enabled.
 =end
     module Sequel
       module Dirty
+        extend Plugin
+
+        depends_on :sequel, include: false
+        depends_on :dirty, include: false
+
+        included_hook do |klass, backend_class|
+          if options[:dirty] && sequel_class?(klass)
+            backend_class.include BackendMethods
+            klass.include MethodsBuilder.new(*names)
+          end
+        end
+
         # Builds module which overrides dirty methods to handle translated as
         # well as normal (untranslated) attributes.
         class MethodsBuilder < Module
@@ -58,5 +70,7 @@ Automatically includes dirty plugin in model class when enabled.
 
       end
     end
+
+    register_plugin(:sequel_dirty, Sequel::Dirty)
   end
 end

@@ -1,4 +1,6 @@
 # frozen-string-literal: true
+require "active_record/relation"
+
 module Mobility
   module Plugins
 =begin
@@ -15,6 +17,18 @@ enabled for any one attribute on the model.
 =end
     module ActiveRecord
       module Query
+        extend Plugin
+
+        depends_on :active_record, include: false
+        depends_on :query, include: false
+
+        plugin = self
+        included_hook do |klass, backend_class|
+          if options[:query] && active_record_class?(klass)
+            plugin.apply(names, klass, backend_class)
+          end
+        end
+
         class << self
           def apply(names, model_class, backend_class)
             model_class.class_eval do
@@ -272,5 +286,7 @@ enabled for any one attribute on the model.
         private_constant :QueryExtension, :FindByMethods
       end
     end
+
+    register_plugin(:active_record_query, ActiveRecord::Query)
   end
 end

@@ -26,10 +26,9 @@ Values are added to the cache in two ways:
       depends_on :backend, include: :before
 
       # Applies cache plugin to attributes.
-      included_hook do |model_class, backend_class|
+      included_hook do |_, backend_class|
         if options[:cache]
           backend_class.include(BackendMethods) unless backend_class.apply_plugin(:cache)
-          model_class.include CacheResetter.new(*names)
         end
       end
 
@@ -65,52 +64,6 @@ Values are added to the cache in two ways:
 
         def cache
           @cache ||= {}
-        end
-      end
-
-      class CacheResetter < Module
-        def initialize(*names)
-          @names = names
-        end
-
-        def included(klass)
-          names = @names
-
-          method_names(klass).each do |method_name|
-            priv = klass.private_method_defined?(method_name)
-            define_method method_name do |*args|
-              super(*args).tap do
-                names.each { |name| mobility_backends[name].clear_cache }
-              end
-            end
-            private method_name if priv
-          end
-        end
-
-        private
-
-        def method_names(klass)
-          if Loaded::ActiveRecord && klass < ::ActiveRecord::Base
-            active_record_methods
-          elsif Loaded::ActiveRecord && klass.ancestors.include?(::ActiveModel::Dirty)
-            active_model_methods
-          elsif Loaded::Sequel && klass < ::Sequel::Model
-            sequel_methods
-          else
-            []
-          end
-        end
-
-        def active_record_methods
-          %i[changes_applied clear_changes_information reload]
-        end
-
-        def active_model_methods
-          %i[changes_applied clear_changes_information]
-        end
-
-        def sequel_methods
-          %i[refresh]
         end
       end
     end

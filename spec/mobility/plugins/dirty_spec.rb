@@ -5,8 +5,6 @@ describe Mobility::Plugins::Dirty do
   include Helpers::Plugins
 
   context "option value is truthy" do
-    plugin_setup dirty: true
-
     shared_examples_for "dirty module" do
       let(:methods_class) { parent_module.const_get("MethodsBuilder") }
       let(:backend_methods) { parent_module.const_get("BackendMethods") }
@@ -26,6 +24,8 @@ describe Mobility::Plugins::Dirty do
 
     context "model_class includes ActiveModel::Dirty", orm: :active_record do
       context "including class is an ActiveRecord::Base" do
+        plugin_setup dirty: true, active_record: true
+
         it_behaves_like "dirty module" do
           let(:parent_module) { Mobility::Plugins::ActiveRecord::Dirty }
           let(:model_class) { Class.new(ActiveRecord::Base) }
@@ -33,6 +33,8 @@ describe Mobility::Plugins::Dirty do
       end
 
       context "including class is not an ActiveRecord::Base" do
+        plugin_setup dirty: true, active_model: true
+
         it_behaves_like "dirty module" do
           let(:parent_module) { Mobility::Plugins::ActiveModel::Dirty }
           let(:model_class) do
@@ -45,6 +47,8 @@ describe Mobility::Plugins::Dirty do
     end
 
     context "options[:model_class] is a Sequel::Model", orm: :sequel do
+      plugin_setup dirty: true, sequel: true
+
       it_behaves_like "dirty module" do
         let(:parent_module) { Mobility::Plugins::Sequel::Dirty }
         let(:model_class) { Class.new(Sequel::Model) }

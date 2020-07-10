@@ -40,6 +40,18 @@ locale suffix, so +title_en+, +title_pt_br+, etc.)
 
 =end
       module Dirty
+        extend Plugin
+
+        depends_on :active_record, include: false
+        depends_on :dirty, include: false
+
+        included_hook do |klass, backend_class|
+          if options[:dirty] && active_record_class?(klass)
+            backend_class.include BackendMethods
+            klass.include MethodsBuilder.new(*names)
+          end
+        end
+
         class MethodsBuilder < ActiveModel::Dirty::MethodsBuilder
           # @param [Attributes] attributes
           def included(model_class)
@@ -98,5 +110,7 @@ locale suffix, so +title_en+, +title_pt_br+, etc.)
         BackendMethods = ActiveModel::Dirty::BackendMethods
       end
     end
+
+    register_plugin(:active_record_dirty, ActiveRecord::Dirty)
   end
 end

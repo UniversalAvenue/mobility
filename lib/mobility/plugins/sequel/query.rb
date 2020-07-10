@@ -8,6 +8,18 @@ See ActiveRecord::Query plugin.
 =end
     module Sequel
       module Query
+        extend Plugin
+
+        depends_on :sequel, include: false
+        depends_on :query, include: false
+
+        plugin = self
+        included_hook do |klass, _|
+          if options[:query] && sequel_class?(klass)
+            plugin.apply(klass)
+          end
+        end
+
         class << self
           def apply(model_class)
             model_class.class_eval do
@@ -140,5 +152,7 @@ See ActiveRecord::Query plugin.
         end
       end
     end
+
+    register_plugin(:sequel_query, Sequel::Query)
   end
 end

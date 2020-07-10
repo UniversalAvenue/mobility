@@ -14,6 +14,8 @@ attributes only.
     module AttributeMethods
       extend Plugin
 
+      depends_on :active_record, include: false
+
       # Applies attribute_methods plugin for a given option value.
       included_hook do |model_class|
         if options[:attribute_methods]
@@ -24,14 +26,10 @@ attributes only.
       private
 
       def include_attribute_methods_module(model_class, *attribute_names)
-        module_builder =
-          if Loaded::ActiveRecord && model_class.ancestors.include?(::ActiveRecord::AttributeMethods)
-            require "mobility/plugins/active_record/attribute_methods_builder"
-            Plugins::ActiveRecord::AttributeMethodsBuilder
-          else
-            raise ArgumentError, "#{model_class} does not support AttributeMethods plugin."
-          end
-        model_class.include module_builder.new(*attribute_names)
+        if model_class.ancestors.include?(::ActiveRecord::AttributeMethods)
+          require "mobility/plugins/active_record/attribute_methods_builder"
+          model_class.include Plugins::ActiveRecord::AttributeMethodsBuilder.new(*attribute_names)
+        end
       end
     end
 

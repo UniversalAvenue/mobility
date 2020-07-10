@@ -42,11 +42,21 @@ the ActiveRecord dirty plugin for more information.
 
 =end
       module Dirty
+        extend Plugin
+
+        depends_on :active_model, include: false
+        depends_on :dirty, include: false
+
+        included_hook do |klass, backend_class|
+          if options[:dirty] && active_model_class?(klass)
+            backend_class.include BackendMethods
+            klass.include MethodsBuilder.new(*names)
+          end
+        end
+
         # Builds module which adds suffix/prefix methods for translated
         # attributes so they act like normal dirty-tracked attributes.
         class MethodsBuilder < Module
-          delegate :handler_methods_module, :method_patterns, to: :class
-
           def initialize(*attribute_names)
             define_dirty_methods(attribute_names)
           end
@@ -61,6 +71,14 @@ the ActiveRecord dirty plugin for more information.
 
           def append_locale(attr_name)
             Mobility.normalize_locale_accessor(attr_name)
+          end
+
+          def handler_methods_module
+            self.class.handler_methods_module
+          end
+
+          def method_patterns
+            self.class.method_patterns
           end
 
           private
@@ -312,5 +330,7 @@ the ActiveRecord dirty plugin for more information.
         end
       end
     end
+
+    register_plugin(:active_model_dirty, ActiveModel::Dirty)
   end
 end
