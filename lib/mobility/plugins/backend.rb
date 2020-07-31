@@ -37,7 +37,7 @@ Defines:
         super
 
         if backend_name
-          @backend_class = load_backend(backend_name, klass: klass)
+          @backend_class = load_backend(backend_name)
             .with_options(@options.merge(model_class: klass))
 
           klass.include InstanceMethods
@@ -59,7 +59,7 @@ Defines:
         "#<Attributes (#{backend_name}) @names=#{names.join(", ")}>"
       end
 
-      def load_backend(backend, klass:)
+      def load_backend(backend)
         Backends.load_backend(backend)
       end
 
