@@ -100,7 +100,7 @@ RSpec.configure do |config|
   end
 
   config.order = "random"
-  config.filter_run_excluding orm: lambda { |v| ![*v].include?(orm&.to_sym) }, db: lambda { |v| ![*v].include?(db.to_sym) }
+  config.filter_run_excluding orm: lambda { |v| ![*v].include?(orm&.to_sym) || (orm && (v == 'none')) }, db: lambda { |v| ![*v].include?(db.to_sym) }
 end
 
 class TestAttributes < Mobility::Attributes
