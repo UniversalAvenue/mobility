@@ -49,7 +49,6 @@ the ActiveRecord dirty plugin for more information.
         initialize_hook do
           if options[:dirty]
             define_dirty_methods(names)
-            include InstanceMethods
             include dirty_handler_methods
           end
         end
@@ -59,6 +58,7 @@ the ActiveRecord dirty plugin for more information.
 
           if options[:dirty]
             private_methods = InstanceMethods.instance_methods & klass.private_instance_methods
+            klass.include InstanceMethods
             klass.class_eval { private(*private_methods) }
 
             backend_class.include BackendMethods
