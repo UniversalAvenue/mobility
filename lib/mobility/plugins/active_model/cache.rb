@@ -6,11 +6,11 @@ module Mobility
       module Cache
         extend Plugin
 
-        depends_on :active_model, include: false
+        depends_on :active_model_dirty, include: false
         depends_on :cache, include: false
 
         included_hook do |klass, _|
-          if options[:cache] && active_model_class?(klass)
+          if options[:cache]
             mod = self
 
             klass.class_eval do

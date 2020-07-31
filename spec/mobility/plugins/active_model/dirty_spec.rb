@@ -6,6 +6,15 @@ describe "Mobility::Plugins::ActiveModel::Dirty", orm: :active_record do
   include Helpers::Plugins
   plugin_setup active_model: true, dirty: true, reader: true, writer: true
 
+  it "raises TypeError unless class is a subclass of ActiveModel::Dirty" do
+    klass = Class.new
+    am_class = Class.new
+    am_class.include ::ActiveModel::Dirty
+
+    expect { klass.include attributes }.to raise_error(TypeError, /should include ActiveModel\:\:Dirty/)
+    expect { am_class.include attributes }.not_to raise_error
+  end
+
   def define_backend_class
     Class.new do
       include Mobility::Backend

@@ -44,14 +44,21 @@ the ActiveRecord dirty plugin for more information.
       module Dirty
         extend Plugin
 
-        depends_on :active_model, include: false
         depends_on :dirty, include: false
 
         included_hook do |klass, backend_class|
-          if options[:dirty] && active_model_class?(klass)
+          raise TypeError, "#{name} should include ActiveModel::Dirty to use the active_model plugin" unless active_model_dirty_class?(klass)
+
+          if options[:dirty]
             backend_class.include BackendMethods
             klass.include MethodsBuilder.new(*names)
           end
+        end
+
+        private
+
+        def active_model_dirty_class?(klass)
+          klass.ancestors.include?(::ActiveModel::Dirty)
         end
 
         # Builds module which adds suffix/prefix methods for translated
