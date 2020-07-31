@@ -21,6 +21,13 @@ module Mobility
       depends_on :sequel_cache
       depends_on :sequel_query
 
+      included_hook do |klass|
+        unless sequel_class?(klass)
+          name = klass.name || klass.to_s
+          raise TypeError, "#{name} should be a subclass of Sequel::Model to use the sequel plugin"
+        end
+      end
+
       private
 
       def sequel_class?(klass)

@@ -15,7 +15,7 @@ See ActiveRecord::Query plugin.
 
         plugin = self
         included_hook do |klass, _|
-          if options[:query] && sequel_class?(klass)
+          if options[:query]
             plugin.apply(klass)
           end
         end

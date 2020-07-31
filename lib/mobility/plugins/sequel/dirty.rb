@@ -19,7 +19,7 @@ Automatically includes dirty plugin in model class when enabled.
         depends_on :dirty, include: false
 
         included_hook do |klass, backend_class|
-          if options[:dirty] && sequel_class?(klass)
+          if options[:dirty]
             backend_class.include BackendMethods
             klass.include MethodsBuilder.new(*names)
           end

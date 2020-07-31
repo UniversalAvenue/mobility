@@ -8,7 +8,7 @@ module Mobility
         depends_on :sequel, include: false
 
         def load_backend(backend, klass:)
-          if Symbol === backend && klass < ::Sequel::Model
+          if Symbol === backend
             require "mobility/backends/sequel/#{backend}"
             Backends.load_backend("sequel_#{backend}".to_sym)
           else

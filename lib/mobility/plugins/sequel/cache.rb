@@ -10,7 +10,7 @@ module Mobility
         depends_on :cache, include: false
 
         included_hook do |klass, _|
-          if options[:cache] && sequel_class?(klass)
+          if options[:cache]
             mod = self
             klass.include(Module.new do
               %i[refresh].each do |method_name|
