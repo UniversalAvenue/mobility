@@ -1,0 +1,29 @@
+require "spec_helper"
+
+describe "Mobility::Plugins::ActiveRecord::Cache", orm: :active_record do
+  include Helpers::Plugins
+  plugin_setup active_record: true, cache: true
+
+  let(:model_class) do
+    klass = Class.new(ActiveRecord::Base)
+    klass.table_name = :articles
+    klass
+  end
+
+  %w[changes_applied clear_changes_information].each do |method_name|
+    it "clears backend cache after #{method_name}" do
+      model_class.include attributes
+
+      expect(instance.mobility_backends[:title]).to receive(:clear_cache).once
+      instance.send(method_name)
+    end
+  end
+
+  it "clears cache after reload" do
+    model_class.include attributes
+
+    instance = model_class.create
+    expect(instance.mobility_backends[:title]).to receive(:clear_cache).once
+    instance.reload
+  end
+end
