@@ -24,9 +24,7 @@ enabled for any one attribute on the model.
 
         plugin = self
         included_hook do |klass, backend_class|
-          if options[:query] && active_record_class?(klass)
-            plugin.apply(names, klass, backend_class)
-          end
+          plugin.apply(names, klass, backend_class) if options[:query]
         end
 
         class << self

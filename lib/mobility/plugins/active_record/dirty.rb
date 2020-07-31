@@ -46,7 +46,7 @@ locale suffix, so +title_en+, +title_pt_br+, etc.)
         depends_on :dirty, include: false
 
         included_hook do |klass, backend_class|
-          if options[:dirty] && active_record_class?(klass)
+          if options[:dirty]
             backend_class.include BackendMethods
             klass.include MethodsBuilder.new(*names)
           end
