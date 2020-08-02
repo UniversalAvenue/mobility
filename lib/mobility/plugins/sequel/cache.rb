@@ -3,6 +3,11 @@
 module Mobility
   module Plugins
     module Sequel
+=begin
+
+Adds hook to clear Mobility cache when +refresh+ is called on Sequel model.
+
+=end
       module Cache
         extend Plugin
 
