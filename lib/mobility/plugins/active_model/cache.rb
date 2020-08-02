@@ -3,6 +3,11 @@
 module Mobility
   module Plugins
     module ActiveModel
+=begin
+
+Adds hooks to clear Mobility cache when AM dirty reset methods are called.
+
+=end
       module Cache
         extend Plugin
 

@@ -4,6 +4,12 @@ require "mobility/plugins/active_model/cache"
 module Mobility
   module Plugins
     module ActiveRecord
+=begin
+
+Resets cache on calls to +reload+, in addition to other AM dirty reset
+methods.
+
+=end
       module Cache
         extend Plugin
 
