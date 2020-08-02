@@ -1,9 +1,9 @@
 require "mobility/arel"
-require "mobility/active_record/uniqueness_validator"
 require_relative "./active_record/backend"
 require_relative "./active_record/dirty"
 require_relative "./active_record/cache"
 require_relative "./active_record/query"
+require_relative "./active_record/uniqueness_validation"
 
 module Mobility
 =begin
@@ -19,18 +19,12 @@ Plugin for ActiveRecord models.
       depends_on :active_record_dirty
       depends_on :active_record_cache
       depends_on :active_record_query
+      depends_on :active_record_uniqueness_validation
 
       included_hook do |klass|
         unless active_record_class?(klass)
           name = klass.name || klass.to_s
           raise TypeError, "#{name} should be a subclass of ActiveRecord::Base to use the active_record plugin"
-        end
-
-        klass.class_eval do
-          unless const_defined?(:UniquenessValidator, false)
-            self.const_set(:UniquenessValidator,
-                           Class.new(::Mobility::ActiveRecord::UniquenessValidator))
-          end
         end
       end
 
