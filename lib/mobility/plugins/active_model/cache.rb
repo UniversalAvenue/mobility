@@ -8,31 +8,26 @@ module Mobility
 
         depends_on :cache, include: false
 
-        initialize_hook do
+        included_hook do |klass, _|
           if options[:cache]
             mod = self
-            cache_methods.each do |method_name|
+            private_methods = dirty_reset_methods & klass.private_instance_methods
+
+            dirty_reset_methods.each do |method_name|
               define_method method_name do |*args|
                 super(*args).tap do
                   mod.names.each { |name| mobility_backends[name].clear_cache }
                 end
               end
             end
-          end
-        end
-
-        included_hook do |klass, _|
-          if options[:cache]
-            cache_methods.each do |method_name|
-              private method_name if klass.private_method_defined?(method_name)
-            end
+            klass.class_eval { private(*private_methods) }
           end
         end
 
         private
 
-        def cache_methods
-          %w[changes_applied clear_changes_information]
+        def dirty_reset_methods
+          %i[changes_applied clear_changes_information]
         end
       end
     end

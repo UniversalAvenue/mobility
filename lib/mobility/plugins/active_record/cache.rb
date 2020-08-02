@@ -12,8 +12,8 @@ module Mobility
 
         private
 
-        def cache_methods
-          super + %w[reload]
+        def dirty_reset_methods
+          super + %i[reload]
         end
       end
     end
