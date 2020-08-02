@@ -6,7 +6,6 @@ module Mobility
       module Cache
         extend Plugin
 
-        depends_on :active_model_dirty, include: false
         depends_on :cache, include: false
 
         initialize_hook do
