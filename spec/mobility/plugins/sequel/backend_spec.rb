@@ -1,7 +1,8 @@
 require "spec_helper"
-require "mobility/plugins/sequel/backend"
 
 describe "Mobility::Plugins::Sequel::Backend", orm: :sequel do
+  require "mobility/plugins/sequel/backend"
+
   include Helpers::Plugins
 
   plugin_setup do

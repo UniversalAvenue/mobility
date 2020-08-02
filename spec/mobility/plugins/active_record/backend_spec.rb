@@ -1,7 +1,8 @@
 require "spec_helper"
-require "mobility/plugins/active_record/backend"
 
 describe "Mobility::Plugins::ActiveRecord::Backend", orm: :active_record do
+  require "mobility/plugins/active_record/backend"
+
   include Helpers::Plugins
 
   plugin_setup do
