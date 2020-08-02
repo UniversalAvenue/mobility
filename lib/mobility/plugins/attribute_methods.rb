@@ -16,19 +16,30 @@ attributes only.
 
       depends_on :active_record, include: false
 
-      # Applies attribute_methods plugin for a given option value.
-      included_hook do |model_class|
-        if options[:attribute_methods]
-          include_attribute_methods_module(model_class, *names)
+      initialize_hook do |*names|
+        include InstanceMethods
+
+        define_method :translated_attributes do
+          super().merge(names.inject({}) do |attributes, name|
+            attributes.merge(name.to_s => send(name))
+          end)
         end
       end
 
-      private
+      # Applies attribute_methods plugin for a given option value.
+      included_hook do |model_class|
+        if options[:attribute_methods]
+          define_method :untranslated_attributes, ::ActiveRecord::Base.instance_method(:attributes)
+        end
+      end
 
-      def include_attribute_methods_module(model_class, *attribute_names)
-        if model_class.ancestors.include?(::ActiveRecord::AttributeMethods)
-          require "mobility/plugins/active_record/attribute_methods_builder"
-          model_class.include Plugins::ActiveRecord::AttributeMethodsBuilder.new(*attribute_names)
+      module InstanceMethods
+        def translated_attributes
+          {}
+        end
+
+        def attributes
+          super.merge(translated_attributes)
         end
       end
     end
