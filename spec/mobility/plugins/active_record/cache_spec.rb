@@ -17,6 +17,13 @@ describe "Mobility::Plugins::ActiveRecord::Cache", orm: :active_record do
       expect(instance.mobility_backends[:title]).to receive(:clear_cache).once
       instance.send(method_name)
     end
+
+    it "does not change visibility of #{method_name}" do
+      priv = model_class.private_method_defined?(method_name)
+      model_class.include attributes
+
+      expect(model_class.private_method_defined?(method_name)).to eq(priv)
+    end
   end
 
   it "clears cache after reload" do
