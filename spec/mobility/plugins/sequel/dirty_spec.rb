@@ -210,4 +210,17 @@ describe Mobility::Plugins::Sequel::Dirty, orm: :sequel do
       end
     end
   end
+
+  %i[initial_value column_change column_changed? reset_column].each do |method_name|
+    it "does not change visibility of #{method_name}" do
+      # Create a dummy Sequel model so we can inspect its dirty methods.
+      klass = Class.new(Sequel::Model)
+      klass.plugin :dirty
+      dirty = klass.new
+
+      expect(instance.respond_to?(method_name)).to eq(dirty.respond_to?(method_name))
+      expect(instance.respond_to?(method_name, true)).to eq(true)
+      expect(dirty.respond_to?(method_name, true)).to eq(true)
+    end
+  end
 end if defined?(Sequel)
