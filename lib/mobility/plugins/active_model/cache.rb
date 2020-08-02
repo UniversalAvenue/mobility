@@ -9,22 +9,31 @@ module Mobility
         depends_on :active_model_dirty, include: false
         depends_on :cache, include: false
 
-        included_hook do |klass, _|
+        initialize_hook do
           if options[:cache]
             mod = self
-
-            klass.class_eval do
-              %i[changes_applied clear_changes_information].each do |method_name|
-                priv = klass.private_method_defined?(method_name)
-                define_method method_name do |*args|
-                  super(*args).tap do
-                    mod.names.each { |name| mobility_backends[name].clear_cache }
-                  end
+            cache_methods.each do |method_name|
+              define_method method_name do |*args|
+                super(*args).tap do
+                  mod.names.each { |name| mobility_backends[name].clear_cache }
                 end
-                private method_name if priv
               end
             end
           end
+        end
+
+        included_hook do |klass, _|
+          if options[:cache]
+            cache_methods.each do |method_name|
+              private method_name if klass.private_method_defined?(method_name)
+            end
+          end
+        end
+
+        private
+
+        def cache_methods
+          %w[changes_applied clear_changes_information]
         end
       end
     end

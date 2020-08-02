@@ -1,4 +1,5 @@
 # frozen-string-literal: true
+require "mobility/plugins/active_model/cache"
 
 module Mobility
   module Plugins
@@ -7,25 +8,12 @@ module Mobility
         extend Plugin
 
         depends_on :active_record, include: false
-        depends_on :cache, include: false
+        depends_on :active_model_cache, include: :before
 
-        included_hook do |klass, _|
-          if options[:cache]
-            mod = self
-            klass.include(Module.new do
-              %i[changes_applied clear_changes_information reload].each do |method_name|
-                priv = klass.private_method_defined?(method_name)
-                define_method method_name do |*args|
-                  super(*args).tap do
-                    mod.names.each do |name|
-                      mobility_backends[name].clear_cache
-                    end
-                  end
-                end
-                private method_name if priv
-              end
-            end)
-          end
+        private
+
+        def cache_methods
+          super + %w[reload]
         end
       end
     end
