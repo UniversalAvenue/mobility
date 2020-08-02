@@ -331,7 +331,7 @@ describe "Mobility::Plugins::ActiveRecord::Dirty", orm: :active_record do
   end
 
   %w[changes_applied clear_attribute_changes clear_changes_information].each do |method_name|
-    it "does not change private status of #{method_name}" do
+    it "does not change visibility of #{method_name}" do
       # Create a dummy AR model so we can inspect its dirty methods. This way
       # test works for all versions of Rails (private/public status of these
       # methods has changed between versions.)
