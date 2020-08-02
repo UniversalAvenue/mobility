@@ -23,7 +23,11 @@ describe "Mobility::Plugins::ActiveRecord::Cache", orm: :active_record do
     model_class.include attributes
 
     instance = model_class.create
-    expect(instance.mobility_backends[:title]).to receive(:clear_cache).once
+    if ::ActiveRecord::VERSION::MAJOR == 4
+      expect(instance.mobility_backends[:title]).to receive(:clear_cache).at_least(1).time
+    else
+      expect(instance.mobility_backends[:title]).to receive(:clear_cache).once
+    end
     instance.reload
   end
 end
