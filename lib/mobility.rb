@@ -18,11 +18,6 @@ value of {Mobility.accessor_method}, which defaults to +translates+).
     translates :title, backend: :key_value
   end
 
-When defining this module, Mobility attempts to +require+ various gems (for
-example, +active_record+ and +sequel+) to evaluate which are loaded. Loaded
-gems are tracked with dynamic subclasses of the {Loaded} module and referenced
-in backends to define gem-dependent behavior.
-
 =end
 module Mobility
   # A generic exception used by Mobility.
@@ -33,7 +28,6 @@ module Mobility
   require "mobility/backends"
   require "mobility/configuration"
   require "mobility/fallbacks"
-  require "mobility/loaded"
   require "mobility/plugin"
   require "mobility/plugins"
   require "mobility/attributes"
@@ -44,14 +38,7 @@ module Mobility
   CALL_COMPILABLE_REGEXP = /\A[a-zA-Z_]\w*[!?]?\z/
   private_constant :CALL_COMPILABLE_REGEXP
 
-  begin
-    require "rails"
-    Loaded::Rails = true
-    require "rails/generators/mobility/generators"
-  rescue LoadError => e
-    raise unless e.message =~ /rails/
-    Loaded::Rails = false
-  end
+  require "rails/generators/mobility/generators" if defined?(Rails)
 
   class << self
     def extended(model_class)
@@ -193,7 +180,7 @@ module Mobility
     #   simply default to +I18n.available_locales+, we may define many more
     #   methods (in LocaleAccessors) than is really necessary.
     def available_locales
-      if Loaded::Rails && Rails.application
+      if defined?(Rails) && Rails.application
         Rails.application.config.i18n.available_locales || I18n.available_locales
       else
         I18n.available_locales
