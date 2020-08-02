@@ -9,22 +9,14 @@ module Mobility
         depends_on :sequel, include: false
         depends_on :cache, include: false
 
-        included_hook do |klass, _|
+        initialize_hook do
           if options[:cache]
             mod = self
-            klass.include(Module.new do
-              %i[refresh].each do |method_name|
-                priv = klass.private_method_defined?(:refresh)
-                define_method method_name do |*args|
-                  super(*args).tap do
-                    mod.names.each do |name|
-                      mobility_backends[name].clear_cache
-                    end
-                  end
-                end
-                private method_name if priv
+            define_method :refresh do |*args|
+              super(*args).tap do
+                mod.names.each { |name| mobility_backends[name].clear_cache }
               end
-            end)
+            end
           end
         end
       end
