@@ -38,7 +38,7 @@ describe Mobility::Plugins::Presence do
       it "does not modify options passed in" do
         options = { presence: false }
         expect(listener).to receive(:read).once.with(:fr, any_args).and_return("")
-        backend.read(:fr, options)
+        backend.read(:fr, **options)
         expect(options).to eq({ presence: false })
       end
     end
@@ -72,7 +72,7 @@ describe Mobility::Plugins::Presence do
       it "does not modify options passed in" do
         options = { presence: false }
         expect(listener).to receive(:write).once.with(:fr, "foo", any_args)
-        backend.write(:fr, "foo", options)
+        backend.write(:fr, "foo", **options)
         expect(options).to eq({ presence: false })
       end
     end
