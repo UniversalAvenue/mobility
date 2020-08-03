@@ -11,12 +11,12 @@ describe Mobility::Attributes do
   let(:backend_class) do
     backend_double = backend
     Class.new(Mobility::Backends::Null) do
-      define_method :read do |*args|
-        backend_double.read(*args)
+      define_method :read do |*args, **kwargs|
+        backend_double.read(*args, **kwargs)
       end
 
-      define_method :write do |*args|
-        backend_double.write(*args)
+      define_method :write do |*args, **kwargs|
+        backend_double.write(*args, **kwargs)
       end
     end
   end
@@ -46,7 +46,7 @@ describe Mobility::Attributes do
     let(:expected_options) { { foo: "bar", **Mobility.default_options, model_class: Article } }
 
     it "calls with_options on backend class with options merged with default options" do
-      expect(backend_class).to receive(:with_options).with(expected_options).and_return(Class.new(backend_class))
+      expect(backend_class).to receive(:with_options).with(**expected_options).and_return(Class.new(backend_class))
       attributes = described_class.new("title", backend: backend_class, foo: "bar")
       Article.include attributes
     end
@@ -258,13 +258,13 @@ describe Mobility::Attributes do
       shared_examples_for "reader" do
         it "correctly maps getter method for translated attribute to backend" do
           expect(Mobility).to receive(:locale).and_return(:de)
-          expect(backend).to receive(:read).with(:de, {}).and_return("foo")
+          expect(backend).to receive(:read).with(:de).and_return("foo")
           expect(article.title).to eq("foo")
         end
 
         it "correctly maps presence method for translated attribute to backend" do
           expect(Mobility).to receive(:locale).and_return(:de)
-          expect(backend).to receive(:read).with(:de, {}).and_return("foo")
+          expect(backend).to receive(:read).with(:de).and_return("foo")
           expect(article.title?).to eq(true)
         end
 
@@ -297,7 +297,7 @@ describe Mobility::Attributes do
       shared_examples_for "writer" do
         it "correctly maps setter method for translated attribute to backend" do
           expect(Mobility).to receive(:locale).and_return(:de)
-          expect(backend).to receive(:write).with(:de, "foo", {})
+          expect(backend).to receive(:write).with(:de, "foo")
           article.title = "foo"
         end
 
@@ -347,28 +347,28 @@ describe Mobility::Attributes do
       it "converts blanks to nil when receiving from backend getter" do
         Article.include described_class.new(:reader, "title", backend: backend_class)
         allow(Mobility).to receive(:locale).and_return(:cz)
-        expect(backend).to receive(:read).with(:cz, {}).and_return("")
+        expect(backend).to receive(:read).with(:cz).and_return("")
         expect(article.title).to eq(nil)
       end
 
       it "converts blanks to nil when sending to backend setter" do
         Article.include described_class.new(:writer, "title", backend: backend_class)
         allow(Mobility).to receive(:locale).and_return(:fr)
-        expect(backend).to receive(:write).with(:fr, nil, {})
+        expect(backend).to receive(:write).with(:fr, nil)
         article.title = ""
       end
 
       it "does not convert false values to nil when receiving from backend getter" do
         Article.include described_class.new(:reader, "title", backend: backend_class)
         allow(Mobility).to receive(:locale).and_return(:cz)
-        expect(backend).to receive(:read).with(:cz, {}).and_return(false)
+        expect(backend).to receive(:read).with(:cz).and_return(false)
         expect(article.title).to eq(false)
       end
 
       it "does not convert false values to nil when sending to backend setter" do
         Article.include described_class.new(:writer, "title", backend: backend_class)
         allow(Mobility).to receive(:locale).and_return(:fr)
-        expect(backend).to receive(:write).with(:fr, false, {})
+        expect(backend).to receive(:write).with(:fr, false)
         article.title = false
       end
     end

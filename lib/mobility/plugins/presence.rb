@@ -35,7 +35,7 @@ backend. Included by default, but can be disabled with +presence: false+ option.
         if options.delete(:presence) == false
           super
         else
-          super(locale, Presence[value], options)
+          super(locale, Presence[value], **options)
         end
       end
       # @!endgroup

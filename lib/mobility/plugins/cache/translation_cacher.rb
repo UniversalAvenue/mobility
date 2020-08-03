@@ -17,11 +17,11 @@ and also to cache translation *records* in {Mobility::Backends::Table} and
         def initialize(fetch_method)
           class_eval <<-EOM, __FILE__, __LINE__ + 1
             def #{fetch_method} locale, **options
-              return super(locale, options) if options.delete(:cache) == false
+              return super(locale, **options) if options.delete(:cache) == false
               if cache.has_key?(locale)
                 cache[locale]
               else
-                cache[locale] = super(locale, options)
+                cache[locale] = super(locale, **options)
               end
             end
           EOM
